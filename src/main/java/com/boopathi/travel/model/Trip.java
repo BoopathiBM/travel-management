@@ -3,11 +3,17 @@ package com.boopathi.travel.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Getter;
@@ -56,4 +62,11 @@ public class Trip {
         this.updatedAt = LocalDateTime.now();
     }
 
+    @JsonIgnore
+    @OneToMany(mappedBy= "trip",cascade=CascadeType.ALL)
+    private List<Booking> booking;
+
+   
+
 }
+    

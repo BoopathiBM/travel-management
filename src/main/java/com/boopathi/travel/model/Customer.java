@@ -2,12 +2,17 @@ package com.boopathi.travel.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Getter;
@@ -20,34 +25,38 @@ import lombok.Setter;
 @Entity
 public class Customer {
 
-	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
-	private Long id;
-	private String firstName;
-	private String lastName;
-	private String email;
-	private String phoneNumber;
-	private String address;
-	private LocalDate dateOfBirth;
-	
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable=false)
-	private LocalDateTime updatedAt = LocalDateTime.now(); 
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private String address;
+    private LocalDate dateOfBirth;
 
-	@PrePersist
-	protected void onCreate(){
-		LocalDateTime now = LocalDateTime.now();
-		this.createdAt = now;  
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
         this.updatedAt = now;
-		
-	}
 
-	@PreUpdate
-	protected void onUpdate(){
-		this.updatedAt = LocalDateTime.now();
-	}
-	
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @JsonIgnore
+    @OneToMany(mappedBy= "customer", cascade= CascadeType.ALL)
+    private List<Booking> booking;
 
 }
