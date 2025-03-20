@@ -14,6 +14,7 @@ import com.boopathi.travel.model.Trip;
 import com.boopathi.travel.repo.BookingRepository;
 import com.boopathi.travel.repo.CustomerRepository;
 import com.boopathi.travel.repo.TripRepository;
+import com.dto.BookingRequestDTO;
 
 @Service
 public class BookingService {
@@ -35,33 +36,29 @@ public class BookingService {
         return bookingRepository.findById(id);
     }
 
-    public Booking createBooking(Long customerId, Long tripId, int noOfPeople) {
+    public Booking createBooking(BookingRequestDTO bookingRequestDTO) {
 
-        
-        if (customerId == null || tripId == null) {
-            throw new IllegalArgumentException("Customer ID and Trip ID must not be null");
+        Optional<Customer> customerOpt = customerRepository.findById(bookingRequestDTO.getCustomerId());
+
+        Optional<Trip> tripOpt = tripRepository.findById(bookingRequestDTO.getTripId());
+
+        if(customerOpt.isEmpty() || tripOpt.isPresent()){
+            throw new IllegalArgumentException("invalid customer or trip");
         }
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        Booking book = new Booking();
 
-        Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new RuntimeException("Trip not found"));
+        book.setBookingDate(LocalDateTime.now());
+        book.setStatus("Confirmed");
+        book.setNumberOfPeople(bookingRequestDTO.getNumberOfPeople());
+        book.setTotalPrice((totalPrice(tripOpt.get().getPrice(),bookingRequestDTO.getNumberOfPeople())));
+        book.setCustomer(customerOpt.get());
+        book.setTrip(tripOpt.get());
+        book.setCreatedAt(LocalDateTime.now());
+        book.setUpdatedAt(LocalDateTime.now());
 
-        Booking booking = new Booking();
-        booking.setCustomer(customer);
-        booking.setTrip(trip);
 
-        booking.setBookingDate(LocalDateTime.now());
-        booking.setStatus("Confirmed");
-        booking.setPaymentStatus("Pending");
-        booking.setNumberOfPeople(noOfPeople);
-        booking.setTotalPrice(totalPrice(trip.getPrice(), noOfPeople));
-        booking.setCreatedAt(LocalDateTime.now());
-        booking.setUpdatedAt(LocalDateTime.now());
-
-        // ✅ Save the booking
-        return bookingRepository.save(booking);
+        return null;
 
     }
 
